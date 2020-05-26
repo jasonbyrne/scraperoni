@@ -10,7 +10,7 @@ import { scraperoni } from "scraperoni";
     .section("events", "#events .article", [
       ["title", "h3"],
       ["summary", "p"],
-      ["link", "h3 a => [href]"],
+      ["link", "h3 a@href"],
     ])
     .fetch();
   console.log(articles);
