@@ -6,8 +6,9 @@ const fetchPage = bent("GET", "string");
 
 const parseSection = ($: CheerioStatic, section: Section) => {
   const articles: Article[] = [];
-  $(section.path).each((_index, element) => {
+  $(section.path).each((_index, item) => {
     const article = new Article();
+    const $item = $(item);
     section.fields.forEach((field) => {
       const value = field.paths
         .map((fieldPath) => {
@@ -15,13 +16,18 @@ const parseSection = ($: CheerioStatic, section: Section) => {
           const path = parts.shift() || "";
           const func = (parts.length > 1 && parts.pop()) || "";
           const attr = (func && func.match(/\[([a-z]+)\]/i)) || null;
-          let value = attr
-            ? $(element).find(path).attr(attr[1])
-            : $(element).find(path).text();
-          if (field.key == "link" && value) {
-            value = new URL(value, section.scraper.baseUrl).href;
-          }
-          return value;
+          const elements = $item.find(path);
+          const values: string[] = [];
+          elements.each((_index, element) => {
+            let value = !attr
+              ? $(element).text()
+              : $(element).attr(attr[1]) || "";
+            if (field.key == "link" && value) {
+              value = new URL(value, section.scraper.baseUrl).href;
+            }
+            values.push(value);
+          });
+          return values.join(field.joiner);
         })
         .join(field.joiner);
       article["section"] = section.title;
@@ -40,10 +46,10 @@ export class Field {
   public paths: string[];
   public joiner: string;
 
-  constructor(key: FieldKey, paths: string[], joiner: string = " ") {
+  constructor(key: FieldKey, paths: string[], joiner?: string) {
     this.key = key;
     this.paths = paths;
-    this.joiner = joiner;
+    this.joiner = joiner || " ";
   }
 }
 
