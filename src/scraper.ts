@@ -11,9 +11,10 @@ const parseSection = ($: CheerioStatic, section: Section) => {
     section.fields.forEach((field) => {
       const value = field.paths
         .map((fieldPath) => {
-          const path = fieldPath.split("=>").shift() || "";
-          const func = fieldPath.split("=>").pop() || "";
-          const attr = func.match(/\[([a-z]+)\]/i);
+          const parts = fieldPath.split("=>");
+          const path = parts.shift() || "";
+          const func = (parts.length > 1 && parts.pop()) || "";
+          const attr = (func && func.match(/\[([a-z]+)\]/i)) || null;
           let value = attr
             ? $(element).find(path).attr(attr[1])
             : $(element).find(path).text();
