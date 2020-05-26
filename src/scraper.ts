@@ -12,16 +12,13 @@ const parseSection = ($: CheerioStatic, section: Section) => {
     section.fields.forEach((field) => {
       const value = field.paths
         .map((fieldPath) => {
-          const parts = fieldPath.split("=>");
+          const parts = fieldPath.split("@");
           const path = parts.shift() || "";
-          const func = (parts.length > 1 && parts.pop()) || "";
-          const attr = (func && func.match(/\[([a-z]+)\]/i)) || null;
+          const attr = parts.length > 1 ? parts[1] : null;
           const elements = $item.find(path);
           const values: string[] = [];
           elements.each((_index, element) => {
-            let value = !attr
-              ? $(element).text()
-              : $(element).attr(attr[1]) || "";
+            let value = !attr ? $(element).text() : $(element).attr(attr) || "";
             if (field.key == "link" && value) {
               value = new URL(value, section.scraper.baseUrl).href;
             }
