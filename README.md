@@ -1,5 +1,18 @@
-# typescript-project-starter
+# Scraperoni
 
-This is a boilerplate to start off your vanilla TypeScript project. It comes with Jest for unit tests, Flagpole for e2e tests, ESLint and Prettier with a good set of base rules. There are also some VS Code editor settings and ignore files.
+Simple scraping tool to turn web sites into news feeds.
 
-This starter kit does not assume any specific frameworks. It is designed for a backend project with Node.
+```typescript
+import { scraperoni } from "scraperoni";
+
+(async () => {
+  const articles = await scraperoni("http://www.seminolecountyfl.gov/")
+    .section("events", "#events .article", [
+      ["title", "h3"],
+      ["summary", "p"],
+      ["link", "h3 a => [href]"],
+    ])
+    .fetch();
+  console.log(articles);
+})();
+```
